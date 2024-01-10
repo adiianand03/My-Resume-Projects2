@@ -7,6 +7,7 @@
 #include <mysql_connection.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
+#include <fstream>  // Include for ofstream
 #include "preprocess.hpp"
 #include "util.hpp"
 
@@ -18,6 +19,33 @@ void printSeparator(const vector<int>& columnWidths) {
         cout << std::setw(width + 4) << std::setfill('-') << "+";
     }
     cout << "+" << endl;
+}
+
+// Function to export data to Excel (CSV format)
+void exportToExcel(const vector<string>& columnLabels, const vector<vector<string>>& data, const string& filename) {
+    ofstream outfile(filename);
+
+    // Write column labels
+    for (size_t i = 0; i < columnLabels.size(); ++i) {
+        outfile << columnLabels[i];
+        if (i < columnLabels.size() - 1) {
+            outfile << ",";
+        }
+    }
+    outfile << endl;
+
+    // Write data
+    for (const auto& row : data) {
+        for (size_t i = 0; i < row.size(); ++i) {
+            outfile << row[i];
+            if (i < row.size() - 1) {
+                outfile << ",";
+            }
+        }
+        outfile << endl;
+    }
+
+    outfile.close();
 }
 
 // Dummy definition of URL and WriteCallback
@@ -123,11 +151,29 @@ int main(void) {
                 // Reset result set to the beginning
                 res->beforeFirst();
 
-                // Print table data
+                // Print table data to console
+                vector<vector<string>> rowData;
                 while (res->next()) {
-                    cout << "|";
+                    vector<string> row;
                     for (int i = 1; i <= numColumns; ++i) {
-                        cout << std::setw(columnWidths[i - 1]) << std::left << res->getString(i) << "|";
+                        row.push_back(res->getString(i));
+                    }
+                    rowData.push_back(row);
+                }
+
+                // Export data to Excel (CSV format)
+                vector<string> columnLabels;
+                for (int i = 1; i <= numColumns; ++i) {
+                    columnLabels.push_back(res->getMetaData()->getColumnLabel(i));
+                }
+
+                exportToExcel(columnLabels, rowData, "output.csv");
+
+                // Print table data to console
+                for (const auto& row : rowData) {
+                    cout << "|";
+                    for (size_t i = 0; i < row.size(); ++i) {
+                        cout << std::setw(columnWidths[i]) << std::left << row[i] << "|";
                     }
                     cout << endl;
                 }
@@ -157,4 +203,4 @@ int main(void) {
 
     return 0;
 }
-//g++ -Wall -I/usr/include/cppconn -o ct curl4.cpp -L/usr/lib -lmysqlcppconn -lcurl
+//g++ -Wall -I/usr/include/cppconn -o ct curlexcelonce.cpp -L/usr/lib -lmysqlcppconn -lcurl
