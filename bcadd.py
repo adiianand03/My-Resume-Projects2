@@ -10,10 +10,10 @@ from streamlit_option_menu import option_menu
 
 # loading the saved models
 
-diabetes_model = pickle.load(open('C:/Users/Aditya Anand/Desktop/Multiple Disease Prediction System/saved models/diabetes_model.sav', 'rb'))
-heart_disease_model = pickle.load(open('C:/Users/Aditya Anand/Desktop/Multiple Disease Prediction System/saved models/heart_disease_model.sav','rb'))
-parkinsons_model = pickle.load(open('C:/Users/Aditya Anand/Desktop/Multiple Disease Prediction System/saved models/parkinsons_model.sav', 'rb'))
-breast_model=pickle.load(open('C:/Users/Aditya Anand/Desktop/Multiple Disease Prediction System/saved models/breast_cancer_model.sav', 'rb'))
+diabetes_model = pickle.load(open('diabetes_model.sav', 'rb'))
+heart_disease_model = pickle.load(open('heart_disease_model.sav','rb'))
+parkinsons_model = pickle.load(open('parkinsons_model.sav', 'rb'))
+breast_model=pickle.load(open('breast_cancer_model.sav', 'rb'))
 
 # sidebar navigation
 with st.sidebar:
@@ -84,8 +84,13 @@ if (selected == 'Heart Disease Prediction'):
         if not all([age, sex, cp, trestbps, chol, fbs, restecg,thalach,exang,oldpeak,slope,ca,thal]):
             st.warning("Please fill in all the fields.")
         else:
-            heart_prediction = heart_model.predict([[age, sex, cp, trestbps, chol, fbs, restecg,thalach,exang,oldpeak,slope,ca,thal]])                          
-            
+            #heart_prediction = heart_model.predict([[age, sex, cp, trestbps, chol, fbs, restecg,thalach,exang,oldpeak,slope,ca,thal]])                          
+            user_input = [age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]
+
+            user_input = [float(x) for x in user_input]
+
+            heart_prediction = heart_disease_model.predict([user_input])
+
             if (heart_prediction[0] == 1):
               heart_diagnosis = 'The person has a heart disease'
             else:
@@ -140,8 +145,13 @@ if (selected == 'Diabetes Prediction'):
         if not all([Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]):
             st.warning("Please fill in all the fields.")
         else:
-            diab_prediction = diabetes_model.predict([[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]])
-            
+            #diab_prediction = diabetes_model.predict([[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]])
+            user_input = [Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin,
+                      BMI, DiabetesPedigreeFunction, Age]
+
+            user_input = [float(x) for x in user_input]
+
+            diab_prediction = diabetes_model.predict([user_input])
             if (diab_prediction[0] == 1):
               diab_diagnosis = 'The person is diabetic'
             else:
@@ -237,8 +247,14 @@ if (selected == 'Parkinson\'s Prediction'):
         if not all([fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ, DDP, Shimmer, Shimmer_dB, APQ3, APQ5, APQ, DDA, NHR, HNR, RPDE, DFA, spread1, spread2, D2, PPE]):
             st.warning("Please fill in all the fields.")
         else:
-            parkinsons_prediction = parkinsons_model.predict([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])                          
-            
+            #parkinsons_prediction = parkinsons_model.predict([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])                          
+            user_input = [fo, fhi, flo, Jitter_percent, Jitter_Abs,
+                      RAP, PPQ, DDP,Shimmer, Shimmer_dB, APQ3, APQ5,
+                      APQ, DDA, NHR, HNR, RPDE, DFA, spread1, spread2, D2, PPE]
+
+            user_input = [float(x) for x in user_input]
+
+            parkinsons_prediction = parkinsons_model.predict([user_input])
             if (parkinsons_prediction[0] == 1):
               parkinsons_diagnosis = "The person has Parkinson's disease"
             else:
@@ -338,7 +354,7 @@ if selected == 'Breast Cancer Prediction':
                     worst_concave_points, worst_symmetry, worst_fractal_dimension]):
             st.warning("Please fill in all the fields.")
         else:
-            cancer_prediction = breast_model.predict([[mean_radius, mean_texture, mean_perimeter, mean_area,
+            user_input = [mean_radius, mean_texture, mean_perimeter, mean_area,
                                                        mean_smoothness, mean_compactness, mean_concavity,
                                                        mean_concave_points, mean_symmetry, mean_fractal_dimension,
                                                        radius_error, texture_error, perimeter_error, area_error,
@@ -346,7 +362,11 @@ if selected == 'Breast Cancer Prediction':
                                                        concave_points_error, symmetry_error, fractal_dimension_error,
                                                        worst_radius, worst_texture, worst_perimeter, worst_area,
                                                        worst_smoothness, worst_compactness, worst_concavity,
-                                                       worst_concave_points, worst_symmetry, worst_fractal_dimension]])
+                                                       worst_concave_points, worst_symmetry, worst_fractal_dimension]
+
+            user_input = [float(x) for x in user_input]
+
+            cancer_prediction = breast_model.predict([user_input])
             
             if cancer_prediction[0] == 1:
                 cancer_diagnosis = 'The person is diagnosed with breast cancer.'
